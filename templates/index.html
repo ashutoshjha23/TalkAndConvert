@@ -22,6 +22,8 @@
     </form>
     <div id="file-result" class="text-center p-4 border rounded-lg bg-white shadow-lg mt-3 w-full max-w-md"></div>
 
+    <audio id="audio-player" controls style="display:none;"></audio>
+
     <script>
         $('#start').click(function() {
             $('#status').text('Listening...');
@@ -55,9 +57,15 @@
         });
 
         function speakText(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            window.speechSynthesis.speak(utterance);
+            $.post('/speak', { text: text }, function(data) {
+                if (data.audio_url) {
+                    const audioPlayer = $('#audio-player');
+                    audioPlayer.attr('src', data.audio_url).show();
+                    audioPlayer[0].play();
+                }
+            });
         }
     </script>
 </body>
 </html>
+    
