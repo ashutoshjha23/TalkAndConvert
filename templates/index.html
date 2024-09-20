@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Recognition App</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4">
+    <h1 class="text-3xl font-bold mb-4">Speech Recognition :/</h1>
+    <button id="start" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg mb-3 transition duration-300 hover:bg-blue-600">Start Recognition</button>
+    <p id="status" class="text-center font-bold text-gray-700"></p>
+    <div id="result" class="text-center p-4 border rounded-lg bg-white shadow-lg w-full max-w-md"></div>
+
+    <h2 class="mt-8 text-xl font-semibold">Convert Text to Speech</h2>
+    <form id="upload-form" enctype="multipart/form-data" class="w-full max-w-md flex flex-col items-center">
+        <div class="mb-4 w-1/2">
+            <input type="file" id="file-input" name="file" class="block w-full text-gray-700 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-500" accept=".txt">
+        </div>
+        <button type="submit" class="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 hover:bg-green-600 w-full">Convert to Speech</button>
+    </form>
+    <div id="file-result" class="text-center p-4 border rounded-lg bg-white shadow-lg mt-3 w-full max-w-md"></div>
+
+    <script>
+        $('#start').click(function() {
+            $('#status').text('Listening...');
+            $.post('/recognize', function(data) {
+                if (data.text) {
+                    $('#result').text(data.text).addClass('text-green-500');
+                    speakText(data.text);
+                } else {
+                    $('#result').text(data.error).addClass('text-red-500');
+                }
+                $('#status').text('');
+            });
+        });
+
+        $('#upload-form').submit(function(event) {
+            event.preventDefault();
+            const fileInput = $('#file-input')[0];
+            if (fileInput.files.length === 0) {
+                alert('Please select a text file.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                $('#file-result').text('Speaking the text: ' + text).addClass('text-blue-500');
+                speakText(text);
+            };
+            reader.readAsText(file);
+        });
+
+        function speakText(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(utterance);
+        }
+    </script>
+</body>
+</html>
