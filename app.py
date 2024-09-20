@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import speech_recognition as sr
 from gtts import gTTS
 import os
@@ -33,8 +33,12 @@ def speak():
     # Use a temporary file to store the audio
     with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as tmp_file:
         tts.save(tmp_file.name)
-        tmp_file.seek(0)
-        return jsonify({'audio_url': tmp_file.name})
+        audio_url = f"/audio/{os.path.basename(tmp_file.name)}"
+        return jsonify({'audio_url': audio_url})
+
+@app.route('/audio/<filename>')
+def serve_audio(filename):
+    return send_from_directory(tempfile.gettempdir(), filename)
 
 if __name__ == '__main__':
     app.run(debug=True)
