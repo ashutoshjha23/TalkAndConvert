@@ -27,5 +27,5 @@ This is a simple Flask web application that provides speech recognition and text
 1. **Clone the repository**:
 
    ```bash
-   git clone <[repository-url](https://github.com/ashutoshjha23/TalkAndConvert/)>
+   git clone <https://github.com/ashutoshjha23/TalkAndConvert/>
    cd TalkAndConvert
